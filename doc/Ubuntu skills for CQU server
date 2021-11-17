@@ -1,0 +1,88 @@
+https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
+Commonly-used commands for running python code on Ubuntu
+    1. Access to Servers
+ssh 172.20.74.32 -l cqu 
+
+source fuqiang_tensorflow/bin/activate //Activate the virtual environment of tensorflow:
+source pytorch_venv_tensorflow/bin/activate //Activate the virtual environment of pytorch
+    2. Commands for ubuntu
+    • pwd // show current directory
+    • sudo apt install x // install x software
+    • virtual --system-site-packages -p python3 ./fuqiang_tensorflow  // create virtual environment
+    • scp   cqu@172.20.74.32: /home/cqu/EventAugment/test.txt   C:\Research\EventAugment  // To copy a file from the remote computer to your computer
+    • ip route // check the IP of the server, which is the one following ‘src’
+    •  
+To copy a file from Windows to Linux
+-pw for the password.
+-replace password with the Linux user password.
+-C:\Users\Admin\Desktop\test.txt represents the path of the file that has to be copied to the Linux system.
+-172.20.74.32 is the IP of the Linux server.
+/home/vagrant is the user accessible path in the Linux system to copy the file.
+Note: the path shouldn’t include space
+    • pscp –r -pw password D:\OneDrive\public_datasets\EventAugment\test.txt   cqu@172.20.74.32: /home/cqu/EventAugmen/   
+To copy an entire directory 
+    • ls // list all the files or folders in the current directory
+    • pip install -r requirement.txt  //install all package in the file
+    • nvidia-smi  // show the task information in the server
+
+    • matplotlib error - no module named tkinter 
+Solution: 
+import matplotlib
+matplotlib.use('agg')
+import matplotlib.pyplot as plt
+
+
+Torch scatter error (e.g., ImportError),
+
+    • Check whether CUDA version matches with pytorch version
+    • Reinstall torch-scatter, torch-sparse, torch-cluster, and torch-geometric with the command “pip install --no-cache-dir torch-scatter” 
+
+
+3.  Python debug in Ubuntu https://docs.python.org/3/library/pdb.html 
+    • Python debug tool: pdb
+    • python -m pdb main.py  // debug the main.py file 
+    • s(tep) : Execute the current line, stop at the first possible occasion (either in a function that is called or on the next line in the current function).
+    • n(ext): Continue execution until the next line in the current function is reached or it returns. (The difference between next and step is that step stops inside a called function, while next executes called functions at (nearly) full speed, only stopping at the next line in the current function.)
+    • unt(il) [lineno]: Without argument, continue execution until the line with a number greater than the current one is reached. With a line number, continue execution until a line with a number greater or equal to that is reached. In both cases, also stop when the current frame returns.
+    • r(eturn): Continue execution until the current function returns.
+    • c(ont(inue)): Continue execution, only stop when a breakpoint is encountered.
+    • j(ump) lineno: Set the next line that will be executed. Only available in the bottom-most frame. This lets you jump back and execute code again, or jump forward to skip code that you don’t want to run.
+
+4. Vim command  https://coderwall.com/p/adv71w/basic-vim-commands-for-getting-started 
+(1) Insert mode (Where you can just type like normal text editor. Press i for insert mode)
+(2) Command mode (Where you give commands to the editor to get things done . Press ESC for command mode). Most of them below are in command mode
+    • set number – show line number
+    • x - to delete the unwanted character
+    • u - to undo the last the command and U to undo the whole line
+    • CTRL-R to redo
+    • A - to append text at the end
+    • :wq - to save and exit
+    • :q! - to trash all changes
+    • dw - move the cursor to the beginning of the word to delete that word
+    • 2w - to move the cursor two words forward.
+    • 3e - to move the cursor to the end of the third word forward.
+    • 0 (zero) to move to the start of the line.
+    • d2w - which deletes 2 words .. number can be changed for deleting the number of consecutive words like d3w
+    • dd to delete the line and 2dd to delete to line .number can be changed for deleting the number of consecutive words
+
+5. 压缩/解压缩
+.tar
+解包：tar xvf FileName.tar
+打包：tar cvf FileName.tar DirName
+（注：tar是打包，不是压缩！）
+———————————————
+.gz
+解压1：gunzip FileName.gz
+解压2：gzip -d FileName.gz
+压缩：gzip FileName
+.tar.gz
+解压：tar zxvf FileName.tar.gz
+压缩：tar zcvf FileName.tar.gz DirName
+———————————————
+.bz2
+解压1：bzip2 -d FileName.bz2
+解压2：bunzip2 FileName.bz2
+压缩： bzip2 -z FileName
+.tar.bz2
+解压：tar jxvf FileName.tar.bz2
+压缩：tar jcvf FileName.tar.bz2 DirName

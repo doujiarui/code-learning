@@ -1,0 +1,9 @@
+1、服务器在一个目录下：git init –bare repo_name.git，初始化空的仓库，但在服务器不会显示文件.
+
+2、客户端ssh-keygen -t rsa生成密钥 
+
+3、传给服务器、本地也是
+ssh-copy-id -i ~/.ssh/id_rsa.pub cqu@IP    
+
+3、本地克隆
+git clone cqu@ip:/../../…git
