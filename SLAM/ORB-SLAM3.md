@@ -50,16 +50,26 @@ three tpes of data association ==[1]==:
     最近的玄武岩[47]是一种立体惯性里程计系统，它从视觉惯性里程计中提取非线性因素，用于BA，并闭合匹配ORB特征的环路，实现非常好到极好的精度。
      Kimera [8]是一种新型的优秀的度量语义映射系统，但其度量部分包括立体惯性里程计加上DBoW2闭环和姿势图优化，实现了与VINS Fusion相似的精度
      在这项工作中，我们建立在ORB-SLAM-VI上，并将其扩展到立体惯性SLAM。我们提出了一种新的基于最大后验概率（MAP）估计的快速初始化方法，该方法适当地考虑了视觉和惯性传感器的不确定性，并在2秒内以5%的误差估计真实尺度，在15秒内收敛到1%的尺度误差。上面讨论的所有其他系统都是视觉惯性里程计方法，其中一些系统通过环路闭合进行扩展，并且缺乏使用中期数据关联的能力。我们相信，这一点，加上我们快速而精确的初始化，是我们的系统获得更高精度的关键，即使在没有循环的序列中也是如此。
-     
+
 ## Multi-Map SLAM
 
     在[65]中，在滤波方法中首次提出了通过地图创建和融合来增加勘探过程中跟踪损失的鲁棒性的想法。第一个基于关键帧的多贴图系统是[66]，但贴图初始化是手动的，系统无法合并或关联不同的子贴图。多地图功能已作为协作地图系统的一个组成部分进行了研究，包括多个地图代理和一个仅接收信息的中央服务器[67]，或具有双向信息流，如C2TAM[68]。MOARSLAM[69]为协作式多设备SLAM提出了一种健壮的无状态客户机-服务器体系结构，但主要关注的是软件体系结构，没有报告准确性结果
     最近，CCM-SLAM[70]，[71]提出了一种分布式多地图系统，用于具有双向信息流的多无人机，构建在ORB-SLAM的基础上。他们的重点是克服有限带宽和分布式处理的挑战，而我们的重点是准确性和鲁棒性，在EuRoC数据集上取得显著更好的结果。Slam[72]还提出了ORB-SLAM2的多地图扩展，但将子地图保留为独立实体，同时执行无缝地图合并，构建更精确的全局地图。
     VINS Mono[7]是一种视觉里程计系统，具有闭环和多地图功能，依赖于位置识别库DBoW2[9]。我们的实验表明ORB-SLAM3，由于能够使用中期数据关联，EuRoc数据集上的单目惯性单次会话操作的精度是VINS Mono的6倍。我们的Atlas系统也基于DBoW2，但提出了一种新的更高召回率的地点识别技术，并使用局部BA执行更详细和准确的地图合并，将优势增加到3。在EuRoC上的多会话操作中，精度是VINS Mono的2倍
-    
+
 ## System Overview
 
+ORBSLAM3 基于 ==Visual-inertial monocular SLAM with map reuse ORBSLAM 4【4】== 和 ORBSLAM2。
 
+![image-20211122105442170](C:\Users\djr\AppData\Roaming\Typora\typora-user-images\image-20211122105442170.png)
+
+和ORBSLAM2相似，但有一些新颖之处：
+- Atlas，用到不同的DBoW2词袋库，用于重定位、回环和地图融合
+- Tracking thread，处理传感器的信息并计算当前帧的位姿，最小化重投影误差去匹配地图的特征，而且还要判断是不是关键帧。当丢失时，会在altas重定位，将匹配到的地图成为active map，如果匹配不到alts，会将当前活跃的地图存储，在初始化一张新的地图。 
+- Local mapping thread，adds keyframes and points to the active map, removes the redundant ones, and refines the map using visual or visual-inertial bundle adjustment, operating in a local window of keyframes close to the current frame. Additionally, in the inertial case, the IMU parameters are initialized and refined by the mapping thread using our novel MAP-estimation technique.
+- loop and map merging thread detects common regions between the active map and the whole Atlas at keyframe rate. If the common area belongs to the active map, it performs loop correction; if it belongs to a different map, both maps are seamlessly merged into a single one, that becomes the active map. After a loop correction, a full BA is launched in an independent thread to further refine the map without affecting real-time performance.有时会在启动一个BA的线程去优化。
+
+## CAMERA MODEL
 
 
 
