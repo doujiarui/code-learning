@@ -2,7 +2,7 @@
 
 ## Abstract
 
-第一个提出视觉、视觉惯导、多地图单目、双目、深度相机的SLAM框架。
+第一个提出视觉、视觉惯导、多地图单目、双目、深度相机和鱼眼相机的SLAM框架。
 
 创新点：
 -  基于特征提取的紧耦合VI SLAM系统，具有实时鲁棒性，比之前的方法精确2-10倍
@@ -71,7 +71,34 @@ ORBSLAM3 基于 ==Visual-inertial monocular SLAM with map reuse ORBSLAM 4【4】
 
 ## CAMERA MODEL
 
+ORB-SLAM在所有系统组件中均假设为针孔相机模型。我们的目标是通过将与相机模型相关的所有属性和函数（投影和非投影函数、雅可比矩阵等）提取到单独的模块中，从整个SLAM管道中提取相机模型。这允许我们的系统通过提供相应的摄像头模块来使用任何摄像头型号。在ORB-SLAM3库中，除了针孔模型（单目、双目、深度）外，我们还提供了Kannala Brandt[12]鱼眼模型。
+
+### A.Relcalization
+
+    一个健壮的SLAM系统需要在跟踪失败时重新定位摄像机的能力。ORB-SLAM通过设置基于ePnP算法[73]的透视n点解算器来解决重新定位问题，该算法假设在所有公式中都有一个校准的针孔相机。为了跟进我们的方法，我们需要一个PnP算法，该算法独立于使用的摄像机模型。因此，我们采用了最大似然透视n点算法（MLPnP）[74]，该算法与相机模型完全解耦，因为它使用投影光线作为输入。相机模型只需要提供从像素到投影光线的非投影功能，就可以使用重新定位。
+
+### B.Non-rectified Stereo SLAM
+    没看懂他们的解决方案
+
+## VISUAL-INERTIAL SLAM
+
+ORB-SLAM-VI[4]是第一个能够重用地图的真正视觉惯性SLAM系统。然而，它仅限于针孔单目相机，初始化速度太慢，在一些具有挑战性的场景中失败。在这项工作中，我们以ORB-SLAM-VI为基础，提供了一种快速、准确的IMU初始化技术，以及一个开源的SLAM库，能够使用针孔和鱼眼相机进行单目惯性和立体惯性SLAM。
+
+### A.Fundamentals  
+
+   【60、61】Visual-Inertial-Aided Navigation for High-Dynamic Motion in Built Environments Without Initial Conditions 和 On-Manifold Preintegration for Real-Time Visual–Inertial Odometry
+
+### C.Tracking and Mapping
+
+   方案【4】Visual-Inertial Monocular SLAM with Map Reuse
+   对于跟踪和映射，我们采用了[4]中提出的方案。跟踪解决了一个简化的视觉惯性优化问题，其中仅优化最后两帧的状态，而贴图点保持不变。对于映射，尝试从方程4中求解整个优化对于大型映射来说是困难的。我们使用关键帧及其点的滑动窗口作为可优化变量，还包括从可共视关键帧对这些点的观察，但保持其姿势固定。
+
+### D.Robustness to tracking loss
+
+
+## MAP MERGING AND LOOP CLOSING
 
 
 
+在这项工作中，我们提出了一种新的地方识别算法，改进召回长期和多地图数据关联。每当贴图线程创建新的关键帧时，就会启动位置识别，尝试检测与Atlas中已存在的任何关键帧的匹配。如果找到的匹配关键帧属于活动贴图，则执行循环闭合。否则，它是一个多地图数据关联，然后将活动地图和匹配地图合并。作为我们方法中的第二个新颖之处，一旦估计了新关键帧和匹配贴图之间的相对姿势，我们定义了一个局部窗口，其中包含匹配关键帧及其在共视图中的邻居。在这个窗口中，我们集中搜索中期数据关联，提高循环结束和地图合并的准确性。这两个新特性解释了在EuRoC实验中，ORB-SLAM3比ORB-SLAM2获得更好的精度。下面将解释不同操作的细节。
 
