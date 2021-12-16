@@ -4,14 +4,21 @@
 
 ## 不管以哪种方式运行SLAM都会实例化==System.cc：==
 
-1.  确定传感器类型并读取ORB字典，为后期的回环检测做准备；
-2.  创建关键帧数据库KeyFrameDatabase，用于存放关键帧相关数据；
-3.  初始化Tracking线程。其实Tracking线程是在main线程中运行的，可以简单的认为main线程就是Tracking线程；
-4.  初始化并启动LocalMapping线程；
-5.  初始化并启动LoopClosing线程；
-6.  初始化并启动窗口显示线程mptViewer；
-7.  在各个线程之间分配资源，方便线程彼此之间的数据交互。
-8.  实例化地图
+1. 确定传感器类型并读取ORB字典，为后期的回环检测做准备；
+
+2. 创建关键帧数据库KeyFrameDatabase，用于存放关键帧相关数据；
+
+3. 初始化Tracking线程。其实Tracking线程是在main线程中运行的，可以简单的认为main线程就是Tracking线程；
+
+4. 初始化并启动LocalMapping线程；
+
+5. 初始化并启动LoopClosing线程；
+
+6. 初始化并启动窗口显示线程mptViewer；
+
+7. 在各个线程之间分配资源，方便线程彼此之间的数据交互。
+
+   
 
 ## 以跑数据集为例
 
@@ -104,13 +111,14 @@ bool LoopClosing::DetectLoop()
 	取出所有当前帧的共视关键帧（>15个共视地图点）,计算关键帧的最小得分minScore
 	
 	Step3:
-	从关键帧数据库中找不低于minScore的候选帧
-	
-	Step4:
 	KeyFrameDatabase::DetectLoopCandidates(pKF,minScore)筛选候选集
 	
-	Step5:
-	连续性检测进一步筛选，返回是否有回环
+	Step4:
+	连续性检测进一步筛选
+		- 取候选帧构建候选帧组
+			-遍历之前的候选帧组
+				- 如果当前候选帧组中的帧存在于之前的候选帧组，我们成为连续，记录连续数量
+				- 如连续数量超过阈值3，我们将这个关键帧放入候选帧集合
 	
 	*/
 }
@@ -153,12 +161,6 @@ vector<KeyFrame*> KeyFrameDatabase::DetectLoopCandidates(pKF,minScore)
 	Step5:
 	- 取组中得分大于minScoreToRetain的候选关键帧集合，返回
 	
-	Step6:
-	连续性检测
-		- 取候选帧构建候选帧组
-			-遍历之前的候选帧组
-				- 如果当前候选帧组存在于之前的候选帧组，我们成为连续，记录连续数量
-				- 如连续数量超过阈值3，我们将其放入候选帧集合
 	
 	*/
 }
